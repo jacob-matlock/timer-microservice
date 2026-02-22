@@ -83,3 +83,17 @@ def resume_timer(timer_id):
     active, or is inactive, the appropriate codes will be returned. Otherwise, the timer will be resumed and the state
     will be changed from paused to active.
     """
+
+    timer = timers[timer_id]
+
+    if timer is None:
+        return jsonify("No Timer Associated With That ID", 404)
+
+    if timer["state"] == "active":
+        return jsonify("Already Active", 304)
+
+    if timer["state"] == "inactive":
+        return jsonify ("Timer Inactive", 409)
+
+    timer["state"] = "active"
+    timer["end"] = time.timer() + timer["time remaining"]
