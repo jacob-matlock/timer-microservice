@@ -5,9 +5,9 @@ app = Flask(__name__)
 
 timers = {}
 
-def create_timer(length = 300) -> str:
+def start_timer(length = 300) -> str:
     """
-    Helper function to create a timer. Starts with a default of 300 seconds.
+    Helper function to start a timer. Starts with a default of 300 seconds.
 
     Parameters:
         length - int
@@ -30,5 +30,5 @@ def set_timer():
 
     Returns a timer ID
     """
-    timer_id = create_timer()
+    timer_id = start_timer()
     return jsonify({"timer id": timer_id}), 200
