@@ -63,6 +63,9 @@ def pause_timer(timer_id):
 
     timer = timers[timer_id]
 
+    if timer is None:
+        return jsonify("No Timer Associated With That ID", 404)
+
     if timer["state"] == "paused":
         return jsonify("Already Paused", 304)
 
