@@ -20,8 +20,8 @@ def refresh_timer_state(timer):
 
     starting_state = timer["state"]
     if timer["state"] == "active" and time.time() >= timer['end']:
-        if "repeat" in timer and timer["repeat"] > 0: #repeat management
-            timer["repeat"] -= 1
+        if "count" in timer and timer["count"] > 0: #count management
+            timer["count"] -= 1
             timer["start"] = time.time()
             timer["end"] = time.time() + timer["duration"]
             return False
@@ -31,7 +31,7 @@ def refresh_timer_state(timer):
 
     return False
 
-def start_timer(length, num_repeat) -> str:
+def start_timer(length, count) -> str:
     """
     Helper function to start a timer. Starts with a default of 300 seconds.
 
@@ -53,8 +53,8 @@ def start_timer(length, num_repeat) -> str:
 
     }
 
-    if num_repeat > 0:
-        timers[timer_id]["repeat"] = num_repeat
+    if count > 0:
+        timers[timer_id]["count"] = count
 
     return timer_id
 
@@ -75,15 +75,15 @@ def set_timer():
         return jsonify({"error": "Duration is a Required Field"}), 400
 
     duration = data["duration"]
-    repeat = data.get("repeat", 0)
+    count = data.get("count", 0)
 
     if not isinstance(duration, int) or duration <= 0:
         return jsonify({"error": "Invalid Duration"}), 400
 
-    if not isinstance(repeat, int) or repeat < 0:
-        return jsonify({"error": "Repeat Field Must be a Positive Integer"}), 400
+    if not isinstance(count, int) or count < 0:
+        return jsonify({"error": "count Field Must be a Positive Integer"}), 400
 
-    timer_id = start_timer(duration, repeat)
+    timer_id = start_timer(duration, count)
 
     return jsonify({"timer id": timer_id}), 200
 
@@ -162,7 +162,7 @@ def get_details(timer_id):
     """
     This is an endpoint that finds the timer with the timer_id provided and returns the following fields to the client:
     timer_id, start, end, and state. If the timer is paused, time_remaining will be returned in place of end. The
-    repeat field will also be returned if it exists. The appropriate codes will be returned upon success or failure.
+    count field will also be returned if it exists. The appropriate codes will be returned upon success or failure.
     """
 
     timer = timers.get(timer_id)
@@ -185,8 +185,8 @@ def get_details(timer_id):
     else:
         response["end"] = timer["end"]
 
-    if "repeat" in timer:
-        response["repeat"] = timer["repeat"]
+    if "count" in timer:
+        response["count"] = timer["count"]
 
     return jsonify(response), 200
 
