@@ -3,10 +3,13 @@
  A Flask based microservice for tracking timers.
 
  ## Features
-
+ 
  - Can set timers based on client length request, or use a default length
+ - Tracks timers logically
  - Can track multiple timers at once
  - Allows client to pause, resume, and delete timers
+ - Requires clients to poll the microservice for timer updates
+ - Validates timer expiration during API requests
  - RESTFUL API interface
 
 ## Requirements
@@ -29,11 +32,77 @@ pip install flask
 
 ## Example Calls
 
-**Set Timer:** `POST \timer
+**Set Timer:** `POST /timer/set-timer`
+- The POST Request must be sent with a JSON body
+- The JSON body must contain a duration field
+- The JSON body must contain a count field
 
+**Request:** 
+```
+TODO: Write example POST request from test.cpp
+```
 
-**
+**Response:**
+```
+({"timer_id": "f455ed55-7f08-3w2q-077r49e81513"})
+```
 
-This microservice tracks timers logically by validating expiration during API requests rather than running continuous real-time timer processes.
-The microservice does not run a persistent background process to actively track timers. Clients are expected to poll the microservice to retrieve timer updates.
+**Pause Timer:** `POST /timer/<timer_id>/pause`
+-The POST Request must have a timer_id in the URL
+
+**Request:**
+```
+TODO: Write example POST request from test.cpp
+```
+
+**Response:**
+```
+({"message": "Timer Paused"})
+```
+
+**Resume Timer:** `POST /timer/<timer_id>/resume`
+-The POST Request must have a timer_id in the URL
+
+**Request:**
+```
+TODO: Write example POST request from test.cpp
+```
+
+**Response:**
+```
+({"message": "Timer Resumed"})
+```
+
+**Delete Timer:** `DELETE /timer/<timer_id>/delete`
+-The POST Request must have a timer_id in the URL
+
+**Request:**
+```
+TODO: Write example DELETE request from test.cpp
+```
+
+**Response:**
+```
+({"message": "Timer Deleted"})
+```
+
+**Get Details:** `GET /timer/<timer_id>/details`
+-The GET Request must have a timer_id in the URL
+
+**Request:**
+```
+TODO Write exmaple GET request from test.cpp
+```
+
+**Response:**
+```
+({"timer_id": "f455ed55-7f08-3w2q-077r49e81513",
+  "start": 1722940867.3386405,
+  "state": "active",
+  "count": 0,
+  "time_remaining": 4.6613595
+  "end": 1722940872.0
+})
+```
+
 
