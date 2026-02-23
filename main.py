@@ -20,7 +20,7 @@ def refresh_timer_state(timer):
 
     starting_state = timer["state"]
     if timer["state"] == "active" and time.time() >= timer['end']:
-        if "count" in timer and timer["count"] >= 0: #count management
+        if "count" in timer and timer["count"] > 1: #count management
             timer["count"] -= 1
             timer["start"] = time.time()
             timer["end"] = time.time() + timer["duration"]
@@ -70,18 +70,23 @@ def set_timer():
     data = request.get_json()
     duration = None
 
+    if not data:
+        return jsonify({"error": "Request Must Contain Duration and Count"}), 400
 
-    if not data or "duration" not in data:
+    if "duration" not in data:
         return jsonify({"error": "Duration is a Required Field"}), 400
 
+    if "count" not in data:
+        return jsonify({"error": "Count is a Required Field"}), 400
+
     duration = data["duration"]
-    count = data.get("count", 0)
+    count = data["count"]
 
     if not isinstance(duration, int) or duration <= 0:
         return jsonify({"error": "Invalid Duration"}), 400
 
-    if not isinstance(count, int) or count < 0:
-        return jsonify({"error": "count Field Must be a Positive Integer"}), 400
+    if not isinstance(count, int) or count <= 0:
+        return jsonify({"error": "Invalid Count"}), 400
 
     timer_id = start_timer(duration, count)
 
@@ -175,7 +180,8 @@ def get_details(timer_id):
     response = {
         "timer_id": timer["timer_id"],
         "start": timer["start"],
-        "state": timer["state"]
+        "state": timer["state"],
+        "count": timer["count"]
     }
 
     if timer["state"] == "paused" and "time_remaining" in timer:
@@ -184,9 +190,6 @@ def get_details(timer_id):
         response["time_remaining"] = max(0, timer["end"] - time.time())
     else:
         response["end"] = timer["end"]
-
-    if "count" in timer:
-        response["count"] = timer["count"]
 
     return jsonify(response), 200
 
