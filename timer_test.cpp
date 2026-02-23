@@ -14,13 +14,12 @@ int main() {
     j["repeat_count"] = 2; 
 
 
-    // TO DO - Update port
-    httplib::Client client("http://localhost:6000");
+    httplib::Client client("http://localhost:8000");
 
     int timer_ID = -1; 
 
     // Create Timer
-    if (auto response = client.Post("/timers", j, "application/json")) {
+    if (auto response = client.Post("/timer/set-timer", j, "application/json")) {
         // If the timer returns correctly: 
 
         // Print the status and response. 
@@ -31,15 +30,63 @@ int main() {
         stringstream ss; 
         ss << "R\"(" << response->body << ")\"";
         json response_body = json::parse(ss.str()); 
-        timer_ID = response_body["ID"]; 
+        timer_ID = response_body["timer id"]; 
 
     } else {
         cerr << "HTTP Error: POST" << endl; 
     }
 
-    // Get status of previously created timer:
+
+
+    // Get general path for /timer/timer_id
     stringstream timer; 
-    timer << "/timers/" << to_string(timer_ID); 
+    timer << "/timer/" << to_string(timer_ID); 
+    string timer_path = timer.str(); 
+
+
+    // Pause timer
+    stringstream pause; 
+    pause << timer_path << "/pause";
+    if (auto response = client.Post(pause.str())) {
+        if (response->status == 404) {
+            //No timer associated iwth ID
+            cout << response->body << endl; 
+        } else if (response->status == 304) {
+            // Timer already paused
+            cout << response->body << endl; 
+        } else if (response->status == 409) {
+            // Timer Inactive
+            cout << response->body << endl; 
+        } else {
+            cout << "Timer Paused" << endl; 
+        }
+    } else {
+        cerr << "HTTP Error: POST (pause)" << endl; 
+    }
+
+    // Resume timer
+    stringstream resume; 
+    resume << timer_path << "/resume"; 
+    if (auto response = client.Post(resume.str())) {
+        if (response->status == 404) {
+            //No timer associated iwth ID
+            cout << response->body << endl; 
+        } else if (response->status == 304) {
+            // Timer already paused
+            cout << response->body << endl; 
+        } else if (response->status == 409) {
+            // Timer Inactive
+            cout << response->body << endl; 
+        } else {
+            cout << "Timer Resumed" << endl; 
+        }
+    } else {
+        cerr << "HTTP Error: POST (pause)" << endl; 
+    }
+
+
+
+    // Get status of previously created timer:
     if(auto response = client.Get(timer.str())) {
         // Save response as JSON
         stringstream ss; 
