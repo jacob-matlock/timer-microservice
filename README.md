@@ -105,4 +105,13 @@ TODO Write exmaple GET request from test.cpp
 })
 ```
 
+## Files:
+- `main.py`
+- `timer_test.cpp`
 
+## Return Codes
+
+- `200` - Success
+- `400` - Bad Request
+- `404` - Not Found
+- `409` - Conflict
