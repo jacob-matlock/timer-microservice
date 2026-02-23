@@ -24,11 +24,12 @@ def refresh_timer_state(timer):
             timer["repeat"] -= 1
             timer["start"] = time.time()
             timer["end"] = time.time() + timer["duration"]
+            return False
         else:
             timer["state"] = "inactive"
-        return True #timer expired during refresh
-    else:
-        return False
+            return True #timer expired during refresh
+
+    return False
 
 def start_timer(length, num_repeat) -> str:
     """
@@ -190,4 +191,4 @@ def get_details(timer_id):
     return jsonify(response), 200
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=8000)
