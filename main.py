@@ -20,7 +20,7 @@ def refresh_timer_state(timer):
 
     starting_state = timer["state"]
     if timer["state"] == "active" and time.time() >= timer['end']:
-        if "count" in timer and timer["count"] > 0: #count management
+        if "count" in timer and timer["count"] >= 0: #count management
             timer["count"] -= 1
             timer["start"] = time.time()
             timer["end"] = time.time() + timer["duration"]
