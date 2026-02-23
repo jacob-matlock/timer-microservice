@@ -5,6 +5,26 @@ app = Flask(__name__)
 
 timers = {}
 
+def refresh_timer_state(timer):
+    """
+    This is a helper function to be called at the beginning of each endpoint. It checks if the timer should be set
+    to inactive before any more action is taken
+
+    Parameters:
+        timer - dictionary
+
+    Returns:
+         True if timer state is changing from active to inactive
+         False otherwise
+    """
+
+    starting_state = timer["state"]
+    if timer["state"] == "active" and time.time() >= timer['end']:
+        timer["state"] = "inactive"
+        return True #timer expired during refresh
+    else:
+        return False
+
 def start_timer(length = 300) -> str:
     """
     Helper function to start a timer. Starts with a default of 300 seconds.
@@ -66,6 +86,10 @@ def pause_timer(timer_id):
     if timer is None:
         return jsonify({"error": "No Timer Associated With That ID"}), 404
 
+    expired = refresh_timer_state(timer)
+    if expired:
+        return jsonify({"error": f"Timer Already Expired At {timer['end']}"}), 409
+
     if timer["state"] == "paused":
         return jsonify({"error": "Already Paused"}), 409
 
@@ -90,10 +114,11 @@ def resume_timer(timer_id):
     if timer is None:
         return jsonify({"error": "No Timer Associated With That ID"}), 404
 
-    if timer["state"] == "active" and time.time() >= timer["end"]:
-        timer["state"] = "inactive"
-        return jsonify({"error": f"Timer Already Expired at {timer['end']}"}), 409
-    elif timer["state"] == "active" and time.time() < timer["end"]:
+    expired = refresh_timer_state(timer)
+    if expired:
+        return jsonify({"error": f"Timer Already Expired At {timer['end']}"}), 409
+
+    if timer["state"] == "active":
         return jsonify({"error": "Already Active"}), 409
 
     if timer["state"] == "inactive":
