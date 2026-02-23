@@ -79,7 +79,7 @@ def pause_timer(timer_id):
 @app.post('timer/<timer_id>/resume')
 def resume_timer(timer_id):
     """
-    This is  an endpoint that resumes the timer with the timer_id provided. If such timer does not exist, is already
+    This is an endpoint that resumes the timer with the timer_id provided. If such timer does not exist, is already
     active, or is inactive, the appropriate codes will be returned. Otherwise, the timer will be resumed and the state
     will be changed from paused to active.
     """
@@ -96,4 +96,19 @@ def resume_timer(timer_id):
         return jsonify ("Timer Inactive", 409)
 
     timer["state"] = "active"
-    timer["end"] = time.timer() + timer["time remaining"]
+    timer["end"] = time.time() + timer["time remaining"]
+
+@app.delete('timer/<timer_id>/delete')
+def delete_timer(timer_id):
+    """
+    This is an endpoint that deletes the timer with the timer_id provided. If such timer does not exist, the appropriate
+    code is returned. Otherwise, the timer is deleted and a success code is returned.
+    """
+
+    timer = timers[timer_id]
+
+    if timer is None:
+        return jsonify("No Timer Associated With That ID", 404)
+
+    del timers[timer_id]
+    return jsonify("Timer Deleted", 204)
