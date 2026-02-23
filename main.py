@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import random, time, uuid
+import time, uuid
 
 app = Flask(__name__)
 
@@ -46,7 +46,7 @@ def set_timer():
     if duration is None:
         timer_id = start_timer()
     else:
-        if isinstance(duration, int) is not int or duration <= 0:
+        if not isinstance(duration, int) or duration <= 0:
             return jsonify({"error": "Invalid Duration"}), 400
 
         timer_id = start_timer(duration)
@@ -90,7 +90,10 @@ def resume_timer(timer_id):
     if timer is None:
         return jsonify({"error": "No Timer Associated With That ID"}), 404
 
-    if timer["state"] == "active":
+    if timer["state"] == "active" and time.time() >= timer["end"]:
+        timer["state"] = "inactive"
+        return jsonify({"error": f"Timer Already Expired at {timer['end']}"}), 409
+    elif timer["state"] == "active" and time.time() < timer["end"]:
         return jsonify({"error": "Already Active"}), 409
 
     if timer["state"] == "inactive":
@@ -114,3 +117,7 @@ def delete_timer(timer_id):
 
     del timers[timer_id]
     return jsonify({"message": "Timer Deleted"}), 200
+
+
+if __name__ == "__main__":
+    app.run(port=5000)
