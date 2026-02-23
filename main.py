@@ -74,9 +74,7 @@ def set_timer():
         return jsonify({"error": "Duration is a Required Field"}), 400
 
     duration = data["duration"]
-
-    if "repeat" in data:
-        repeat = data["repeat"]
+    repeat = data.get("repeat", 0)
 
     if not isinstance(duration, int) or duration <= 0:
         return jsonify({"error": "Invalid Duration"}), 400
@@ -162,8 +160,8 @@ def delete_timer(timer_id):
 def get_details(timer_id):
     """
     This is an endpoint that finds the timer with the timer_id provided and returns the following fields to the client:
-    timer_id, start, end, state. If the timer is paused, timer_remaining will be returned in place of end. The
-    appropriate codes will be returned upon success or failure.
+    timer_id, start, end, and state. If the timer is paused, time_remaining will be returned in place of end. The
+    repeat field will also be returned if it exists. The appropriate codes will be returned upon success or failure.
     """
 
     timer = timers.get(timer_id)
@@ -179,10 +177,15 @@ def get_details(timer_id):
         "state": timer["state"]
     }
 
-    if timer["state"] != "paused":
+    if timer["state"] == "paused" and "time_remaining" in timer:
         response["time_remaining"] = timer["time_remaining"]
+    elif timer["state"] == "active":
+        response["time_remaining"] = max(0, timer["end"] - time.time())
     else:
         response["end"] = timer["end"]
+
+    if "repeat" in timer:
+        response["repeat"] = timer["repeat"]
 
     return jsonify(response), 200
 
