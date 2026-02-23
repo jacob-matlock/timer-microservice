@@ -20,12 +20,17 @@ def refresh_timer_state(timer):
 
     starting_state = timer["state"]
     if timer["state"] == "active" and time.time() >= timer['end']:
-        timer["state"] = "inactive"
+        if "repeat" in timer and timer["repeat"] > 0: #repeat management
+            timer["repeat"] -= 1
+            timer["start"] = time.time()
+            timer["end"] = time.time() + timer["duration"]
+        else:
+            timer["state"] = "inactive"
         return True #timer expired during refresh
     else:
         return False
 
-def start_timer(length = 300) -> str:
+def start_timer(length, num_repeat) -> str:
     """
     Helper function to start a timer. Starts with a default of 300 seconds.
 
@@ -36,15 +41,19 @@ def start_timer(length = 300) -> str:
     Returns:
         timer_id - string
     """
-
     global timers
     timer_id = str(uuid.uuid4())
     timers[timer_id] = {
+        "timer_id": timer_id,
         "start": time.time(),
         "duration": length,
         "end": time.time()+length,
         "state": "active"
+
     }
+
+    if num_repeat > 0:
+        timers[timer_id]["repeat"] = num_repeat
 
     return timer_id
 
@@ -60,16 +69,22 @@ def set_timer():
     data = request.get_json()
     duration = None
 
-    if data is not None:
-        duration = data.get("duration")
 
-    if duration is None:
-        timer_id = start_timer()
-    else:
-        if not isinstance(duration, int) or duration <= 0:
-            return jsonify({"error": "Invalid Duration"}), 400
+    if not data or "duration" not in data:
+        return jsonify({"error": "Duration is a Required Field"}), 400
 
-        timer_id = start_timer(duration)
+    duration = data["duration"]
+
+    if "repeat" in data:
+        repeat = data["repeat"]
+
+    if not isinstance(duration, int) or duration <= 0:
+        return jsonify({"error": "Invalid Duration"}), 400
+
+    if not isinstance(repeat, int) or repeat < 0:
+        return jsonify({"error": "Repeat Field Must be a Positive Integer"}), 400
+
+    timer_id = start_timer(duration, repeat)
 
     return jsonify({"timer id": timer_id}), 200
 
@@ -143,6 +158,33 @@ def delete_timer(timer_id):
     del timers[timer_id]
     return jsonify({"message": "Timer Deleted"}), 200
 
+@app.get('/timer/<timer_id>/details')
+def get_details(timer_id):
+    """
+    This is an endpoint that finds the timer with the timer_id provided and returns the following fields to the client:
+    timer_id, start, end, state. If the timer is paused, timer_remaining will be returned in place of end. The
+    appropriate codes will be returned upon success or failure.
+    """
+
+    timer = timers.get(timer_id)
+
+    if timer is None:
+        return jsonify({"error": "No Timer Associated With That ID"}), 404
+
+    refresh_timer_state(timer)
+
+    response = {
+        "timer_id": timer["timer_id"],
+        "start": timer["start"],
+        "state": timer["state"]
+    }
+
+    if timer["state"] != "paused":
+        response["time_remaining"] = timer["time_remaining"]
+    else:
+        response["end"] = timer["end"]
+
+    return jsonify(response), 200
 
 if __name__ == "__main__":
     app.run(port=5000)
