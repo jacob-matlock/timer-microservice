@@ -24,11 +24,15 @@ pip install flask
    ```bash
    python main.py
    ```
-   Service runs on `http://localhost:5000`
+   Service runs on `http://localhost:8000`
 
 2. **Run tests:**
 
 ## UML Diagram
+<img width="1849" height="7080" alt="Timer Microservice" src="https://github.com/user-attachments/assets/c97e69d2-1c7c-43b8-bd22-08fcadfc0373" />
+
+
+
 
 ## Example Calls
 
@@ -39,7 +43,7 @@ pip install flask
 
 **Request:** 
 ```
-TODO: Write example POST request from test.cpp
+auto response = client.Post("/timer/set-timer", "{"count":2,"duration":5}", "application/json");
 ```
 
 **Response:**
@@ -52,7 +56,7 @@ TODO: Write example POST request from test.cpp
 
 **Request:**
 ```
-TODO: Write example POST request from test.cpp
+auto response = client.Post("/timer/{timer ID}/pause");
 ```
 
 **Response:**
@@ -65,7 +69,7 @@ TODO: Write example POST request from test.cpp
 
 **Request:**
 ```
-TODO: Write example POST request from test.cpp
+auto response = client.Post("/timer/{timer ID}/resume");
 ```
 
 **Response:**
@@ -78,7 +82,7 @@ TODO: Write example POST request from test.cpp
 
 **Request:**
 ```
-TODO: Write example DELETE request from test.cpp
+auto response = client.Delete("/timer/{timer ID}/delete");
 ```
 
 **Response:**
@@ -91,7 +95,7 @@ TODO: Write example DELETE request from test.cpp
 
 **Request:**
 ```
-TODO Write exmaple GET request from test.cpp
+auto response = client.Get("/timer/{timer ID}/details");
 ```
 
 **Response:**
@@ -115,3 +119,4 @@ TODO Write exmaple GET request from test.cpp
 - `400` - Bad Request
 - `404` - Not Found
 - `409` - Conflict
+
