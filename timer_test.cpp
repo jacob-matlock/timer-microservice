@@ -21,7 +21,6 @@ int main() {
     // Connect to port 8000, Initialize a variable for future storage of the timer ID
     httplib::Client client("http://localhost:8000");
     string timer_ID; 
- 
 
     /*
     * This block tests creating a timer. Based on the JSON object defined earlier, the timer will run for a total of 10 seconds with 1 repetition.
@@ -47,9 +46,6 @@ int main() {
         cerr << "TCP Error: POST" << endl; 
         cerr << response.error() << endl; 
     }
-
-
-
     
     // Get general path for /timer/timer_id
     stringstream timer; 
@@ -154,7 +150,6 @@ int main() {
         cerr << "TCP Error: DELETE" << endl; 
         cerr << response.error() << endl;
     }
-
 
     return 0;
 }
