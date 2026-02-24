@@ -10,6 +10,8 @@ using namespace std;
 /*
 *   Note: I don't know how this will vary per each person's environment, but my compilation command is as follows. 
 *           g++ timer_test.cpp -o test -lcpp-httplib -pthread
+*
+*   Note: Running this file requires the libraries "JSON for Modern C++" and "cpp-httplib"
 */
 
 int main() {
