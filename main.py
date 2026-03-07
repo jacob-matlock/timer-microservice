@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import time, uuid
 
 app = Flask(__name__)
 
 timers = {}
 
-def refresh_timer_state(timer):
+def refresh_timer_state(timer: dict) -> bool:
     """
     This is a helper function to be called at the beginning of each endpoint. It checks if the timer should be set
     to inactive before any more action is taken
@@ -31,13 +31,15 @@ def refresh_timer_state(timer):
 
     return False
 
-def start_timer(length, count) -> str:
+def start_timer(length: int, count: int) -> str:
     """
     Helper function to start a timer. Starts with a default of 300 seconds.
 
     Parameters:
         length - int
-            - the client can provide a length but the default is 300 seconds (5 minutes)
+            - the client must provide a length in seconds
+        count - int
+            - the client must provide a count, for how many times the timer should run
 
     Returns:
         timer_id - string
@@ -59,10 +61,10 @@ def start_timer(length, count) -> str:
     return timer_id
 
 @app.post('/timer/set-timer')
-def set_timer():
+def set_timer() -> Response | tuple(Response, int):
     """
     This is an endpoint that sets a timer for the client. If the client's request contains a JSON body with a duration,
-    the timer will be set to that length, otherwise, a default duration is used.
+    the timer will be set to that length. Otherwise, a 400 error is returned.
 
     Returns a timer ID
     """
@@ -93,7 +95,7 @@ def set_timer():
     return jsonify({"timer id": timer_id}), 200
 
 @app.post('/timer/<timer_id>/pause')
-def pause_timer(timer_id):
+def pause_timer(timer_id: str) -> Response | tuple(Response, int):
     """
     This is an endpoint that pauses the timer with the timer_id provided by the client. If such timer does not exist,
     is already paused, or is inactive, the appropriate codes are returned. Otherwise, the timer is paused and its state
@@ -121,7 +123,7 @@ def pause_timer(timer_id):
     return jsonify({"message": "Timer Paused"}), 200
 
 @app.post('/timer/<timer_id>/resume')
-def resume_timer(timer_id):
+def resume_timer(timer_id: str) -> Response | tuple(Response, int):
     """
     This is an endpoint that resumes the timer with the timer_id provided. If such timer does not exist, is already
     active, or is inactive, the appropriate codes will be returned. Otherwise, the timer will be resumed and the state
@@ -148,7 +150,7 @@ def resume_timer(timer_id):
     return jsonify({"message": "Timer Resumed"}), 200
 
 @app.delete('/timer/<timer_id>/delete')
-def delete_timer(timer_id):
+def delete_timer(timer_id: str) -> Response | tuple(Response, int):
     """
     This is an endpoint that deletes the timer with the timer_id provided. If such timer does not exist, the appropriate
     code is returned. Otherwise, the timer is deleted and a success code is returned.
@@ -163,7 +165,7 @@ def delete_timer(timer_id):
     return jsonify({"message": "Timer Deleted"}), 200
 
 @app.get('/timer/<timer_id>/details')
-def get_details(timer_id):
+def get_details(timer_id: str) -> Response | tuple(Response, int):
     """
     This is an endpoint that finds the timer with the timer_id provided and returns the following fields to the client:
     timer_id, start, end, and state. If the timer is paused, time_remaining will be returned in place of end. The
