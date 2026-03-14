@@ -61,7 +61,7 @@ def start_timer(length: int, count: int) -> str:
     return timer_id
 
 @app.post('/timer/set-timer')
-def set_timer() -> Response | tuple(Response, int):
+def set_timer() -> Response | tuple[Response, int]:
     """
     This is an endpoint that sets a timer for the client. If the client's request contains a JSON body with a duration,
     the timer will be set to that length. Otherwise, a 400 error is returned.
@@ -95,7 +95,7 @@ def set_timer() -> Response | tuple(Response, int):
     return jsonify({"timer id": timer_id}), 200
 
 @app.post('/timer/<timer_id>/pause')
-def pause_timer(timer_id: str) -> Response | tuple(Response, int):
+def pause_timer(timer_id: str) -> Response | tuple[Response, int]:
     """
     This is an endpoint that pauses the timer with the timer_id provided by the client. If such timer does not exist,
     is already paused, or is inactive, the appropriate codes are returned. Otherwise, the timer is paused and its state
@@ -123,7 +123,7 @@ def pause_timer(timer_id: str) -> Response | tuple(Response, int):
     return jsonify({"message": "Timer Paused"}), 200
 
 @app.post('/timer/<timer_id>/resume')
-def resume_timer(timer_id: str) -> Response | tuple(Response, int):
+def resume_timer(timer_id: str) -> Response | tuple[Response, int]:
     """
     This is an endpoint that resumes the timer with the timer_id provided. If such timer does not exist, is already
     active, or is inactive, the appropriate codes will be returned. Otherwise, the timer will be resumed and the state
@@ -150,7 +150,7 @@ def resume_timer(timer_id: str) -> Response | tuple(Response, int):
     return jsonify({"message": "Timer Resumed"}), 200
 
 @app.delete('/timer/<timer_id>/delete')
-def delete_timer(timer_id: str) -> Response | tuple(Response, int):
+def delete_timer(timer_id: str) -> Response | tuple[Response, int]:
     """
     This is an endpoint that deletes the timer with the timer_id provided. If such timer does not exist, the appropriate
     code is returned. Otherwise, the timer is deleted and a success code is returned.
@@ -165,7 +165,7 @@ def delete_timer(timer_id: str) -> Response | tuple(Response, int):
     return jsonify({"message": "Timer Deleted"}), 200
 
 @app.get('/timer/<timer_id>/details')
-def get_details(timer_id: str) -> Response | tuple(Response, int):
+def get_details(timer_id: str) -> Response | tuple[Response, int]:
     """
     This is an endpoint that finds the timer with the timer_id provided and returns the following fields to the client:
     timer_id, start, end, and state. If the timer is paused, time_remaining will be returned in place of end. The
